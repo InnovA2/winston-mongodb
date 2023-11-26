@@ -1,0 +1,45 @@
+{
+  "name": "@innova2/winston-mongodb",
+  "version": "0.0.0",
+  "description": "A TypeScript MongoDB transport for winston.",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "peerDependencies": {
+    "winston": "^3"
+  },
+  "dependencies": {
+    "mongodb": "^6.3.0",
+    "winston-transport": "^4.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.9.5",
+    "ts-node": "^10.9.1",
+    "typescript": "^5.3.2"
+  },
+  "keywords": [
+    "winston",
+    "transport",
+    "mongo",
+    "mongodb",
+    "nosql",
+    "ts",
+    "typescript",
+    "nestjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/InnovA2/winston-mongodb.git"
+  },
+  "author": "Angéline Toussaint & Adrien Martineau",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/InnovA2/winston-mongodb/issues"
+  },
+  "homepage": "https://github.com/InnovA2/winston-mongodb#readme"
+}
