@@ -1,16 +1,23 @@
 import * as TransportStream from 'winston-transport';
-import { MongoTransportOptions, PaginatedDataDto } from './types';
+import { BaseLogDocument, MongoTransportOptions, PaginatedDataDto, PaginatedQueryOptions } from './types';
 import { DEFAULT_CAPPED_SIZE, DEFAULT_COL_NAME, DEFAULT_LEVEL, ERR_COL_ALREADY_EXISTS } from './constants';
-import { Collection, Document, Filter, FindOptions, MongoClient, MongoClientOptions } from 'mongodb';
+import {
+    Collection,
+    Filter,
+    FindOptions,
+    MongoClient,
+    MongoClientOptions,
+    OptionalUnlessRequiredId, WithId
+} from 'mongodb';
 import { flattenSomeMetaData } from './helpers';
 
-export class MongoTransport extends TransportStream {
+export class MongoTransport<T extends BaseLogDocument> extends TransportStream {
     private readonly metaDataToFlatten: string[];
-    private collection: Collection;
+    private collection: Collection<T>;
 
     constructor(options: MongoTransportOptions) {
         if (!options.connectionString) {
-            throw new Error("MongoDB transport requires \"connectionString\".");
+            throw new Error('MongoDB transport requires "connectionString".');
         }
 
         super(options);
@@ -22,7 +29,7 @@ export class MongoTransport extends TransportStream {
         this.initCollection(options).then(col => this.collection = col);
     }
 
-    log(info: any, callback = (...args: any[]) => {}) {
+    log(info: T, callback = (...args: any[]) => {}) {
         if (this.silent) {
             return callback(null, true);
         }
@@ -31,13 +38,13 @@ export class MongoTransport extends TransportStream {
 
         const { meta, flattened } = flattenSomeMetaData(initialMeta, this.metaDataToFlatten);
 
-        const doc: Document = {
+        const doc = {
             level,
             message,
             meta,
             ...flattened,
-            timestamp: new Date(),
-        };
+            timestamp: new Date().toISOString(),
+        } as OptionalUnlessRequiredId<T>;
 
         this.collection.insertOne(doc)
             .then(() => {
@@ -50,8 +57,12 @@ export class MongoTransport extends TransportStream {
             });
     }
 
-    query(filter: Filter<Document>, options: FindOptions = {}): Promise<PaginatedDataDto<any> | any[]> {
-        return new Promise<any>(async (resolve, reject) => {
+    query(filter: Filter<T>, options?: Omit<FindOptions, 'limit'>): Promise<WithId<T>[]>;
+
+    query(filter: Filter<T>, options: PaginatedQueryOptions): Promise<PaginatedDataDto<WithId<T>>>;
+
+    query(filter: Filter<T>, options: FindOptions = {}): Promise<PaginatedDataDto<WithId<T>> | WithId<T>[]> {
+        return new Promise(async (resolve, reject) => {
             try {
                 const logs = await this.collection.find(filter, options).toArray();
                 const { limit, skip } = options;
@@ -60,7 +71,7 @@ export class MongoTransport extends TransportStream {
                     const count = await this.collection.countDocuments(filter);
                     const numPage = (skip || 0) / limit + 1;
 
-                    const page = new PaginatedDataDto(logs, limit, numPage, count);
+                    const page = new PaginatedDataDto<WithId<T>>(logs, limit, numPage, count);
 
                     return resolve(page);
                 }
@@ -87,15 +98,14 @@ export class MongoTransport extends TransportStream {
         const cappedSize = options.isCollectionCapped ? (options.cappedSize || DEFAULT_CAPPED_SIZE) : null;
 
         try {
-            return await db.createCollection(collectionName, {
+            return await db.createCollection<T>(collectionName, {
                 capped: options.isCollectionCapped,
                 size: cappedSize,
             });
         } catch (err) {
-            // TODO : tests use case
             // The error 48 means that the collection already exists
             if (err.code !== ERR_COL_ALREADY_EXISTS) throw err;
-            return db.collection(collectionName);
+            return db.collection<T>(collectionName);
         }
     }
 }

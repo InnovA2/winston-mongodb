@@ -1,21 +1,5 @@
 import { TransportStreamOptions } from 'winston-transport';
-import { MongoClientOptions } from 'mongodb';
-
-export class PaginatedDataDto<T> {
-    items: T[];
-    size: number;
-    currentPage: number;
-    totalPages: number;
-    totalItems: number;
-
-    constructor(items: T[], limit: number, page: number, totalItems: number) {
-        this.items = items;
-        this.size = items.length;
-        this.currentPage = +page;
-        this.totalPages = Math.ceil(totalItems / limit);
-        this.totalItems = +totalItems;
-    }
-}
+import { Document, FindOptions, MongoClientOptions, OptionalId } from 'mongodb';
 
 export interface MongoTransportOptions extends TransportStreamOptions {
     /**
@@ -53,4 +37,29 @@ export interface MongoTransportOptions extends TransportStreamOptions {
      * Optional. Flat map meta properties (spread out at the root of the Mongo document.
      */
     metaDataToFlatten?: string[];
+}
+
+export interface BaseLogDocument extends OptionalId<Document> {
+    level: string;
+    message: string;
+    meta?: object;
+    timestamp: string;
+}
+
+export type PaginatedQueryOptions = Omit<FindOptions, 'limit'> & Required<Pick<FindOptions, 'limit'>>;
+
+export class PaginatedDataDto<T> {
+    items: T[];
+    size: number;
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+
+    constructor(items: T[], limit: number, page: number, totalItems: number) {
+        this.items = items;
+        this.size = items.length;
+        this.currentPage = +page;
+        this.totalPages = Math.ceil(totalItems / limit);
+        this.totalItems = +totalItems;
+    }
 }

@@ -1,2 +1,2 @@
 export { MongoTransport } from './mongo.transport';
-export { MongoTransportOptions } from './types';
+export * from './types';
