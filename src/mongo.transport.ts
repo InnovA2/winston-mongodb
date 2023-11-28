@@ -2,7 +2,7 @@ import * as TransportStream from 'winston-transport';
 import { BaseLogDocument, MongoTransportOptions, PaginatedDataDto, PaginatedQueryOptions } from './types';
 import { DEFAULT_CAPPED_SIZE, DEFAULT_COL_NAME, DEFAULT_LEVEL, ERR_COL_ALREADY_EXISTS } from './constants';
 import {
-    Collection,
+    Collection, Document,
     Filter,
     FindOptions,
     MongoClient,
@@ -57,11 +57,11 @@ export class MongoTransport<T extends BaseLogDocument> extends TransportStream {
             });
     }
 
-    query(filter: Filter<T>, options?: Omit<FindOptions, 'limit'>): Promise<WithId<T>[]>;
+    query(filter: Filter<Document>, options?: Omit<FindOptions, 'limit'>): Promise<WithId<T>[]>;
 
-    query(filter: Filter<T>, options: PaginatedQueryOptions): Promise<PaginatedDataDto<WithId<T>>>;
+    query(filter: Filter<Document>, options: PaginatedQueryOptions): Promise<PaginatedDataDto<WithId<T>>>;
 
-    query(filter: Filter<T>, options: FindOptions = {}): Promise<PaginatedDataDto<WithId<T>> | WithId<T>[]> {
+    query(filter: Filter<Document>, options: FindOptions = {}): Promise<PaginatedDataDto<WithId<T>> | WithId<T>[]> {
         return new Promise(async (resolve, reject) => {
             try {
                 const logs = await this.collection.find(filter, options).toArray();
