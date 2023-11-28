@@ -82,6 +82,10 @@ export class MongoTransport<T extends BaseLogDocument> extends TransportStream {
         })
     }
 
+    getCollection() {
+        return this.collection;
+    }
+
     /**
      * Initialize collection's connection.
      * @param options
