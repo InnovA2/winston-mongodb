@@ -117,7 +117,7 @@ const mongoTransport = new MongoTransport<CustomLog>({
 ```
 
 > Please note that changing the type it has no impact on database structure.
-> It's only useful when retrieving logs and directly the collection (`MongoTransport#getCollection`).
+> It's only useful when retrieving logs or directly the collection (`MongoTransport#getCollection`).
 > The document structure in the database depending on winston logs structure.
 
 Example of logging with Nest:
