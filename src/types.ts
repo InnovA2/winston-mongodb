@@ -29,12 +29,12 @@ export interface MongoTransportOptions extends TransportStreamOptions {
     isCollectionCapped: boolean;
 
     /**
-     * Optional. Size limit of the capped collection.
+     * Optional. Size limit in bytes of the capped collection.
      */
     cappedSize?: number;
 
     /**
-     * Optional. Flat map meta properties (spread out at the root of the Mongo document.
+     * Optional. Flat map meta properties (spread out at the root of the Mongo document).
      */
     metaDataToFlatten?: string[];
 }
