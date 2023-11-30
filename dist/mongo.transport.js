@@ -45,7 +45,7 @@ class MongoTransport extends TransportStream {
         const { meta, flattened } = (0, helpers_1.flattenSomeMetaData)(initialMeta, this.metaDataToFlatten);
         const doc = Object.assign(Object.assign({ level,
             message,
-            meta }, flattened), { timestamp: new Date().toISOString() });
+            meta }, flattened), { timestamp: new Date() });
         this.collection.insertOne(doc)
             .then(() => {
             this.emit('logged');
