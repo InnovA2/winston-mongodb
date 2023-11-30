@@ -43,7 +43,7 @@ export class MongoTransport<T extends BaseLogDocument> extends TransportStream {
             message,
             meta,
             ...flattened,
-            timestamp: new Date().toISOString(),
+            timestamp: new Date(),
         } as OptionalUnlessRequiredId<T>;
 
         this.collection.insertOne(doc)

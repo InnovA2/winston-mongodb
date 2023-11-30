@@ -43,7 +43,7 @@ export interface BaseLogDocument extends OptionalId<Document> {
     level: string;
     message: string;
     meta?: object;
-    timestamp: string;
+    timestamp: Date;
 }
 
 export type PaginatedQueryOptions = Omit<FindOptions, 'limit'> & Required<Pick<FindOptions, 'limit'>>;
